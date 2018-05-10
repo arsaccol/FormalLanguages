@@ -99,7 +99,7 @@ class Grammar:
 
     def minimize(self):
         # check if it would generate empty symbol then add it at the end
-        #self.remove_empty_productions()
+        self.remove_empty_productions()
         self.remove_unit_productions()
         #self.remove_useless_symbols()
 
@@ -310,6 +310,29 @@ class Grammar:
         # to that of the grammar
         self.rules = new_rules
 
+    def generate_word(self):
+        import random
+
+        word = ''
+        stack = [self.initial]
+        print('Stack starting with: ')
+
+        print(stack, ' stack length: ', len(stack))
+        while stack:
+            print('Word: ', word)
+            print('Contents of stack: ', stack)
+            current_symbol = stack.pop()
+            if current_symbol in self.terminals:
+                #print('Current symbol (terminal): ', current_symbol)
+                word = current_symbol + word
+            elif current_symbol in self.variables:
+                tail_pool = [rule.tail for rule in self.rules if rule.head == current_symbol]
+                chosen_tail = random.choice(tail_pool)
+                for symbol in chosen_tail[0]:
+                    #print('Stacking up ', symbol)
+                    stack.append(symbol)
+
+        return word
 
 
 def extract_symbol(encoded_symbol):
@@ -348,8 +371,15 @@ def main():
     print(grammar)
 
     grammar.minimize()
-    print('Grammar after minimization')
+    print('Grammar after minimization:')
     print(grammar)
+
+    words = []
+    for i in range(100):
+        words.append(grammar.generate_word())
+
+    for word in words:
+        print(word)
 
 
 if __name__ == '__main__':
